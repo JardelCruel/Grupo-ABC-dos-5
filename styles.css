@@ -762,14 +762,28 @@ main {
   margin-bottom: 1.5rem;
 }
 
-.conclusao-pilares {
+.proposta-card {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(20, 86, 79, .16);
+  border-top: 4px solid var(--teal);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.proposta-card h3 {
+  margin: 0 0 1rem;
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.proposta-pilares {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: .85rem;
-  margin-bottom: 1.5rem;
 }
 
-.conclusao-pilar {
+.proposta-pilar {
   display: flex;
   align-items: flex-start;
   gap: .85rem;
@@ -779,9 +793,9 @@ main {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.conclusao-pilar:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+.proposta-pilar:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
 
-.pilar-icon {
+.proposta-icon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -792,14 +806,14 @@ main {
   flex-shrink: 0;
 }
 
-.conclusao-pilar strong {
+.proposta-pilar strong {
   display: block;
   font-size: .95rem;
   color: var(--charcoal);
   margin-bottom: .2rem;
 }
 
-.conclusao-pilar p {
+.proposta-pilar p {
   font-size: .88rem;
   color: var(--muted);
   line-height: 1.55;
@@ -807,7 +821,7 @@ main {
 }
 
 @media (max-width: 560px) {
-  .conclusao-pilares { grid-template-columns: 1fr; }
+  .proposta-pilares { grid-template-columns: 1fr; }
 }
 
 .conclusao-brand {
