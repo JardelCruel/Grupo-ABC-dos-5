@@ -171,6 +171,10 @@ buildProgressDots();
 addIdeaIcons();
 alignTabPanels();
 
+// Expor funções globalmente para os onclick do HTML
+window.navigateTab = navigateTab;
+window.togglePresentation = togglePresentation;
+
 // Navegar com teclado no modo apresentação
 document.addEventListener('keydown', (e) => {
   if (!document.body.classList.contains('presentation-mode')) return;
