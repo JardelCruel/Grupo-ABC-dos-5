@@ -1,7 +1,6 @@
 const tablist = document.querySelector('[role="tablist"]');
 const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
 const panels = tabs.map((tab) => document.getElementById(tab.getAttribute('aria-controls')));
-const main = document.querySelector('main');
 
 // ── BARRA DE PROGRESSO ──
 const progressSteps = document.getElementById('progress-steps');
@@ -24,12 +23,36 @@ function updateProgress(activeIndex) {
   progressLabel.textContent = `${activeIndex + 1} / ${tabs.length}`;
 }
 
+// ── TEMPORIZADOR DE SLIDE ──
+let timerInterval = null;
+let timerSeconds = 0;
+const timerDisplay = document.getElementById('timer-display');
+
+function startTimer() {
+  timerSeconds = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    const m = Math.floor(timerSeconds / 60);
+    const s = String(timerSeconds % 60).padStart(2, '0');
+    timerDisplay.textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerSeconds = 0;
+  if (timerDisplay) timerDisplay.textContent = '0:00';
+}
+
 // ── MODO APRESENTAÇÃO ──
 function togglePresentation() {
   const btn = document.getElementById('btn-present');
   document.body.classList.toggle('presentation-mode');
   const isOn = document.body.classList.contains('presentation-mode');
   btn.textContent = isOn ? '✕ Sair' : '⛶ Apresentar';
+  isOn ? startTimer() : stopTimer();
 }
 
 function navigateTab(dir) {
@@ -97,39 +120,6 @@ function addIdeaIcons() {
   });
 }
 
-function alignTabPanels() {
-  const mainStyle = getComputedStyle(main);
-  const panelWidth = main.clientWidth
-    - parseFloat(mainStyle.paddingLeft)
-    - parseFloat(mainStyle.paddingRight);
-  let tallestPanel = 0;
-
-  panels.forEach((panel) => {
-    const wasHidden = panel.hidden;
-    const originalStyles = {
-      position: panel.style.position,
-      visibility: panel.style.visibility,
-      width: panel.style.width,
-      minHeight: panel.style.minHeight
-    };
-
-    panel.hidden = false;
-    panel.style.position = 'absolute';
-    panel.style.visibility = 'hidden';
-    panel.style.width = `${panelWidth}px`;
-    panel.style.minHeight = '0';
-    tallestPanel = Math.max(tallestPanel, panel.getBoundingClientRect().height);
-
-    panel.hidden = wasHidden;
-    panel.style.position = originalStyles.position;
-    panel.style.visibility = originalStyles.visibility;
-    panel.style.width = originalStyles.width;
-    panel.style.minHeight = originalStyles.minHeight;
-  });
-
-  main.style.setProperty('--tab-panel-min-height', `${Math.ceil(tallestPanel)}px`);
-}
-
 function activateTab(activeTab, moveFocus = false) {
   const activeIndex = tabs.indexOf(activeTab);
   tabs.forEach((tab) => {
@@ -140,6 +130,8 @@ function activateTab(activeTab, moveFocus = false) {
     panel.hidden = !isActive;
   });
   updateProgress(activeIndex);
+  document.title = `ABC dos 5 – ${activeTab.textContent.trim()}`;
+  if (timerInterval) startTimer();
   if (moveFocus) activeTab.focus();
 }
 
@@ -161,19 +153,13 @@ tabs.forEach((tab, index) => {
   });
 });
 
-let resizeFrame;
-window.addEventListener('resize', () => {
-  cancelAnimationFrame(resizeFrame);
-  resizeFrame = requestAnimationFrame(alignTabPanels);
-});
-window.addEventListener('load', alignTabPanels, { once: true });
 buildProgressDots();
 addIdeaIcons();
-alignTabPanels();
 
 // Expor funções globalmente para os onclick do HTML
 window.navigateTab = navigateTab;
 window.togglePresentation = togglePresentation;
+window.toggleMusic = window.toggleMusic;
 
 // Navegar com teclado no modo apresentação
 document.addEventListener('keydown', (e) => {
@@ -181,3 +167,22 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigateTab(1);
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigateTab(-1);
 });
+
+// Paralaxe 3D no logo de fundo
+const bgLogo = document.getElementById('bg-logo');
+if (bgLogo) {
+  document.addEventListener('mousemove', (e) => {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    const dx = (e.clientX - cx) / cx; // -1 a 1
+    const dy = (e.clientY - cy) / cy;
+    const rotY =  dx * 18;
+    const rotX = -dy * 12;
+    const tx   =  dx * 24;
+    const ty   =  dy * 16;
+    bgLogo.style.transform =
+      `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px))`;
+    bgLogo.querySelector('img').style.transform =
+      `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.08)`;
+  });
+}
