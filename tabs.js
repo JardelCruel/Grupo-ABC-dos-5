@@ -30,7 +30,6 @@ function togglePresentation() {
   document.body.classList.toggle('presentation-mode');
   const isOn = document.body.classList.contains('presentation-mode');
   btn.textContent = isOn ? '✕ Sair' : '⛶ Apresentar';
-  document.getElementById('nav-arrows').style.display = isOn ? 'flex' : 'none';
 }
 
 function navigateTab(dir) {

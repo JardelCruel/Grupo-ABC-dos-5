@@ -301,7 +301,7 @@
 <script src="tabs.js" defer></script>
 
 <!-- SETAS DE NAVEGAÇÃO -->
-<div id="nav-arrows" style="display:none">
+<div id="nav-arrows">
   <button class="nav-arrow" onclick="navigateTab(-1)" title="Anterior">&#8592;</button>
   <button class="nav-arrow" onclick="navigateTab(1)"  title="Próximo">&#8594;</button>
 </div>
@@ -313,18 +313,21 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 300;
-    display: flex;
+    display: none;
     gap: 16px;
     align-items: center;
+  }
+  body.presentation-mode #nav-arrows {
+    display: flex;
   }
   .nav-arrow {
     background: var(--charcoal);
     color: var(--gold-light);
     border: 2px solid var(--coral);
     border-radius: 50%;
-    width: 52px;
-    height: 52px;
-    font-size: 1.4rem;
+    width: 56px;
+    height: 56px;
+    font-size: 1.5rem;
     cursor: pointer;
     display: flex;
     align-items: center;
