@@ -3,6 +3,35 @@ const tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
 const panels = tabs.map((tab) => document.getElementById(tab.getAttribute('aria-controls')));
 const main = document.querySelector('main');
 
+// ── BARRA DE PROGRESSO ──
+const progressSteps = document.getElementById('progress-steps');
+const progressLabel = document.getElementById('progress-label');
+
+function buildProgressDots() {
+  tabs.forEach((tab, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
+    dot.title = tab.textContent.trim();
+    dot.addEventListener('click', () => activateTab(tabs[i]));
+    progressSteps.appendChild(dot);
+  });
+}
+
+function updateProgress(activeIndex) {
+  document.querySelectorAll('.progress-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === activeIndex);
+  });
+  progressLabel.textContent = `${activeIndex + 1} / ${tabs.length}`;
+}
+
+// ── MODO APRESENTAÇÃO ──
+function togglePresentation() {
+  const btn = document.getElementById('btn-present');
+  document.body.classList.toggle('presentation-mode');
+  const isOn = document.body.classList.contains('presentation-mode');
+  btn.textContent = isOn ? '✕ Sair' : '⛶ Apresentar';
+}
+
 function addIdeaIcons() {
   const icons = {
     'panel-estudo': {
@@ -96,15 +125,15 @@ function alignTabPanels() {
 }
 
 function activateTab(activeTab, moveFocus = false) {
+  const activeIndex = tabs.indexOf(activeTab);
   tabs.forEach((tab) => {
     const isActive = tab === activeTab;
     const panel = document.getElementById(tab.getAttribute('aria-controls'));
-
     tab.setAttribute('aria-selected', String(isActive));
     tab.tabIndex = isActive ? 0 : -1;
     panel.hidden = !isActive;
   });
-
+  updateProgress(activeIndex);
   if (moveFocus) activeTab.focus();
 }
 
@@ -132,5 +161,6 @@ window.addEventListener('resize', () => {
   resizeFrame = requestAnimationFrame(alignTabPanels);
 });
 window.addEventListener('load', alignTabPanels, { once: true });
+buildProgressDots();
 addIdeaIcons();
 alignTabPanels();

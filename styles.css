@@ -14,7 +14,7 @@
   --purple-light: #f0eaf4;
   --hover-wash: rgba(255, 255, 255, .15);
   --nav-shadow: 0 2px 8px rgba(0, 0, 0, .3);
-  --card-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, .1);
   --primary: var(--charcoal);
   --accent: var(--coral);
   --light: var(--teal-light);
@@ -29,9 +29,90 @@ body {
   background: var(--cream);
   color: var(--text);
   line-height: 1.7;
+  font-size: 1.05rem;
 }
 
-/* Header */
+/* ── MODO APRESENTAÇÃO ── */
+body.presentation-mode header,
+body.presentation-mode footer,
+body.presentation-mode #music-player { display: none !important; }
+
+body.presentation-mode nav { top: 0; }
+
+body.presentation-mode main {
+  max-width: 100%;
+  padding: 1.5rem 3rem 2rem;
+}
+
+body.presentation-mode .card-body { font-size: 1.18rem; }
+body.presentation-mode .card-header h2 { font-size: 1.4rem; }
+body.presentation-mode .teoria-item p,
+body.presentation-mode .conceito-item p,
+body.presentation-mode .step-text span { font-size: 1rem; }
+
+#btn-present {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 200;
+  background: var(--teal);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  transition: background 0.2s, transform 0.1s;
+  letter-spacing: 0.5px;
+}
+#btn-present:hover { background: var(--charcoal); transform: scale(1.04); }
+
+/* ── BARRA DE PROGRESSO ── */
+#progress-bar {
+  background: #1e1c1a;
+  padding: 5px 1rem 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.progress-steps {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: background 0.3s, transform 0.3s;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.progress-dot:hover { background: rgba(255,255,255,0.45); }
+
+.progress-dot.active {
+  background: var(--coral);
+  transform: scale(1.45);
+}
+
+.progress-label {
+  color: rgba(255,255,255,0.45);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* ── HEADER ── */
 header {
   background: var(--paper);
   padding: 1rem 1.25rem;
@@ -90,7 +171,7 @@ header {
   font-size: .95rem;
 }
 
-/* Navigation */
+/* ── NAVIGATION ── */
 nav {
   background: var(--charcoal);
   position: sticky;
@@ -112,12 +193,13 @@ nav {
   background: transparent;
   color: var(--gold-light);
   cursor: pointer;
-  font-size: .82rem;
+  font-size: .85rem;
   font-weight: 600;
   font-family: inherit;
   white-space: nowrap;
-  padding: .45rem .75rem;
-  transition: background .2s, color .2s;
+  padding: .5rem .85rem;
+  transition: background .2s, color .2s, border-color .2s;
+  border-radius: 4px 4px 0 0;
 }
 
 .tab-button:hover { background: var(--hover-wash); color: var(--white); }
@@ -134,7 +216,7 @@ nav {
 
 .card[role="tabpanel"][hidden] { display: none; }
 
-/* Objective banner */
+/* ── OBJECTIVE BANNER ── */
 .objetivo {
   background: var(--accent);
   color: var(--white);
@@ -157,7 +239,7 @@ nav {
   margin: 0 auto;
 }
 
-/* Main content */
+/* ── MAIN ── */
 main {
   max-width: 900px;
   margin: 0 auto;
@@ -167,9 +249,10 @@ main {
   gap: 2.5rem;
 }
 
+/* ── CARD ── */
 .card {
   background: var(--card);
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow: var(--card-shadow);
   overflow: hidden;
 }
@@ -178,12 +261,18 @@ main {
   display: flex;
   flex-direction: column;
   min-height: var(--tab-panel-min-height, 0px);
+  animation: panel-in 0.38s cubic-bezier(.22,.68,0,1.2) both;
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(22px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .card-header {
   background: var(--primary);
   color: var(--white);
-  padding: 1rem 1.5rem;
+  padding: 1.1rem 1.5rem;
   display: flex;
   align-items: center;
   gap: .75rem;
@@ -213,8 +302,9 @@ main {
   object-fit: cover;
 }
 
-.card-header h2 { font-size: 1.05rem; font-weight: 700; }
+.card-header h2 { font-size: 1.1rem; font-weight: 700; }
 
+/* ── IDEA ICONS ── */
 .idea-icon {
   width: 1.3em;
   height: 1.3em;
@@ -229,81 +319,42 @@ main {
   transform-origin: 50% 70%;
 }
 
-.idea-icon--group {
-  animation: idea-pulse 2.4s ease-in-out infinite;
-}
-
-.idea-icon--case {
-  transform-origin: 38% 38%;
-  animation: search-scan 3s ease-in-out infinite;
-}
-
-.idea-icon--constructivism path {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: block-build 2.8s ease-in-out infinite;
-}
-
+.idea-icon--group { animation: idea-pulse 2.4s ease-in-out infinite; }
+.idea-icon--case { transform-origin: 38% 38%; animation: search-scan 3s ease-in-out infinite; }
+.idea-icon--constructivism path { transform-box: fill-box; transform-origin: center; animation: block-build 2.8s ease-in-out infinite; }
 .idea-icon--constructivism path:nth-child(2) { animation-delay: .18s; }
 .idea-icon--constructivism path:nth-child(3) { animation-delay: .36s; }
-
-.idea-icon--piaget circle {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: thought-pulse 2.4s ease-in-out infinite;
-}
-
+.idea-icon--piaget circle { transform-box: fill-box; transform-origin: center; animation: thought-pulse 2.4s ease-in-out infinite; }
 .idea-icon--piaget circle:nth-of-type(2n) { animation-delay: .3s; }
-
-.idea-icon--vygotsky path {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: dialogue-float 2.5s ease-in-out infinite;
-}
-
+.idea-icon--vygotsky path { transform-box: fill-box; transform-origin: center; animation: dialogue-float 2.5s ease-in-out infinite; }
 .idea-icon--vygotsky path:nth-child(2) { animation-delay: .4s; }
-
-.idea-icon--practice {
-  transform-origin: 20% 80%;
-  animation: pencil-write 2s ease-in-out infinite;
-}
-
-.idea-icon--conclusion path:nth-child(2) {
-  stroke-dasharray: 24;
-  stroke-dashoffset: 24;
-  animation: conclusion-check 3s ease-in-out infinite;
-}
+.idea-icon--practice { transform-origin: 20% 80%; animation: pencil-write 2s ease-in-out infinite; }
+.idea-icon--conclusion path:nth-child(2) { stroke-dasharray: 24; stroke-dashoffset: 24; animation: conclusion-check 3s ease-in-out infinite; }
 
 @keyframes idea-pulse {
   0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
   50% { transform: scale(1.1); filter: drop-shadow(0 0 5px rgba(245, 233, 201, .8)); }
 }
-
 @keyframes search-scan {
   0%, 100% { transform: rotate(0); }
   50% { transform: rotate(-9deg); }
 }
-
 @keyframes block-build {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-2px); }
 }
-
 @keyframes thought-pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.35); }
 }
-
 @keyframes dialogue-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-1.5px); }
 }
-
 @keyframes pencil-write {
   0%, 100% { transform: rotate(0); }
   35%, 65% { transform: rotate(-8deg); }
 }
-
 @keyframes conclusion-check {
   0%, 20% { stroke-dashoffset: 24; }
   55%, 100% { stroke-dashoffset: 0; }
@@ -312,15 +363,17 @@ main {
 @media (prefers-reduced-motion: reduce) {
   .idea-icon,
   .idea-icon * { animation: none !important; }
+  .card[role="tabpanel"] { animation: none; }
 }
 
-.card-body { flex: 1; padding: 1.5rem; }
+/* ── CARD BODY ── */
+.card-body { flex: 1; padding: 1.75rem; }
 
-/* Case study */
+/* ── CASE STUDY ── */
 .caso-box {
   background: var(--light);
   border-left: 4px solid var(--accent);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 1.2rem 1.4rem;
   margin-bottom: 1.2rem;
 }
@@ -334,10 +387,12 @@ main {
   margin-bottom: .4rem;
 }
 
+.caso-box p { font-size: 1rem; line-height: 1.75; }
+
 .desafio {
   background: var(--gold-light);
   border-left: 4px solid var(--gold);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 1.1rem 1.4rem;
 }
 
@@ -350,13 +405,16 @@ main {
   margin-bottom: .4rem;
 }
 
-/* Constructivism */
+.desafio p { font-size: 1rem; line-height: 1.75; }
+
+/* ── CONSTRUCTIVISM ── */
 .bullets { list-style: none; display: flex; flex-direction: column; gap: .8rem; }
 
 .bullets li {
   display: flex;
   gap: .75rem;
   align-items: flex-start;
+  font-size: 1rem;
 }
 
 .bullets li::before {
@@ -370,44 +428,29 @@ main {
 .conceito-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .8rem;
+  gap: .9rem;
   margin-top: 1.2rem;
 }
 
 .conceito-item {
   background: var(--light);
   border-left: 3px solid var(--teal);
-  border-radius: 6px;
-  padding: 1rem;
+  border-radius: 8px;
+  padding: 1.1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.conceito-item:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
 .conceito-item:nth-child(2) { border-left-color: var(--gold); }
 .conceito-item:nth-child(3) { border-left-color: var(--purple); }
 .conceito-item:nth-child(4) { border-left-color: var(--coral); }
 
-.conceito-item h3 {
-  margin-bottom: .35rem;
-  color: var(--charcoal);
-  font-size: .95rem;
-}
+.conceito-item h3 { margin-bottom: .35rem; color: var(--charcoal); font-size: .98rem; }
+.conceito-item p { color: var(--muted); font-size: .93rem; }
 
-.conceito-item p {
-  color: var(--muted);
-  font-size: .9rem;
-}
-
-/* Theories */
-.piaget-visual {
-  margin: 0 auto 1.25rem;
-  max-width: 844px;
-}
-
-.piaget-visual img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
+/* ── THEORIES ── */
+.piaget-visual { margin: 0 auto 1.25rem; max-width: 844px; }
+.piaget-visual img { display: block; width: 100%; height: auto; border-radius: 8px; }
 
 .teoria-grid {
   display: grid;
@@ -417,33 +460,78 @@ main {
 
 .teoria-item {
   background: var(--purple-light);
-  border-radius: 8px;
-  padding: 1rem 1.1rem;
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.teoria-item:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+
 .teoria-item h3 {
-  font-size: .9rem;
+  font-size: .95rem;
   color: var(--purple);
   font-weight: 700;
   margin-bottom: .4rem;
 }
 
-.teoria-item p { font-size: .92rem; color: var(--muted); }
+.teoria-item p { font-size: .95rem; color: var(--muted); line-height: 1.65; }
 
-/* Solution */
+/* ── QUOTE BLOCK ── */
+.quote-block {
+  position: relative;
+  background: var(--charcoal);
+  color: var(--gold-light);
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem 1.4rem 3.4rem;
+  margin-bottom: 1.2rem;
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.75;
+}
+
+.quote-block::before {
+  content: '\201C';
+  position: absolute;
+  left: 0.9rem;
+  top: 0.2rem;
+  font-size: 3.8rem;
+  color: var(--coral);
+  line-height: 1;
+  font-style: normal;
+}
+
+.quote-block cite {
+  display: block;
+  margin-top: 0.7rem;
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* ── SOLUTION ── */
 .pratica-intro {
   margin-bottom: 1.25rem;
   color: var(--muted);
   font-weight: 600;
+  font-size: 1rem;
 }
 
-.steps { display: flex; flex-direction: column; gap: .9rem; }
+.steps { display: flex; flex-direction: column; gap: 1rem; }
 
 .step {
   display: flex;
   gap: 1rem;
   align-items: flex-start;
+  background: var(--light);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
+
+.step:hover { transform: translateX(4px); box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
 
 .step-num {
   background: var(--purple);
@@ -459,18 +547,12 @@ main {
   flex-shrink: 0;
 }
 
-.step-text strong { display: block; font-size: .95rem; color: var(--primary); }
-.step-text span { font-size: .9rem; color: var(--muted); }
+.step-text strong { display: block; font-size: 1rem; color: var(--primary); margin-bottom: 2px; }
+.step-text span { font-size: .93rem; color: var(--muted); }
 
-/* Organization */
+/* ── ORGANIZATION ── */
 .organizacao { margin-top: 1.5rem; }
-
-.organizacao-titulo {
-  font-size: .85rem;
-  color: var(--primary);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
+.organizacao-titulo { font-size: .85rem; color: var(--primary); letter-spacing: 1px; text-transform: uppercase; }
 
 .org-grid {
   display: grid;
@@ -490,20 +572,21 @@ main {
 .org-item .icon { font-size: 1.6rem; margin-bottom: .4rem; }
 .org-item p { font-size: .88rem; font-weight: 600; color: var(--charcoal); }
 
-/* Conclusion */
+/* ── CONCLUSION ── */
 .conclusao-text {
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: var(--muted);
   border-left: 4px solid var(--primary);
-  padding-left: 1rem;
+  padding-left: 1.1rem;
+  line-height: 1.85;
 }
 
 .conclusao-brand {
   display: flex;
   align-items: center;
   gap: 2rem;
-  margin: 2rem -1.5rem -1.5rem;
-  padding: 2rem 1.5rem;
+  margin: 2rem -1.75rem -1.75rem;
+  padding: 2rem 1.75rem;
   color: var(--gold-light);
   background: var(--charcoal);
   border-top: 5px solid var(--coral);
@@ -536,7 +619,7 @@ main {
   line-height: 1.2;
 }
 
-/* Footer */
+/* ── FOOTER ── */
 footer {
   text-align: center;
   padding: 1rem 1.5rem;
@@ -546,46 +629,22 @@ footer {
   border-top: 5px solid var(--coral);
 }
 
+/* ── RESPONSIVE ── */
 @media (max-width: 560px) {
-  .conclusao-brand {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .conclusao-logo {
-    width: 164px;
-    height: 164px;
-  }
-
+  .conclusao-brand { flex-direction: column; gap: 1rem; text-align: center; }
+  .conclusao-logo { width: 164px; height: 164px; }
   .conclusao-brand .footer-title { font-size: 1.5rem; }
-}
-
-@media (max-width: 560px) {
   header { padding: .75rem 1rem; }
-
   .brand-lockup { gap: .5rem; }
-  .brand-image {
-    width: 56px;
-    height: 56px;
-    border-radius: 8px;
-  }
+  .brand-image { width: 56px; height: 56px; border-radius: 8px; }
   .brand-copy { min-width: 0; }
   .brand-title { font-size: 1.15rem; }
   .brand-subtitle { font-size: .72rem; line-height: 1.3; }
   .team-row { gap: .12rem; }
   .team-member { width: 16px; height: 38px; }
-
-  nav {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding: .35rem .5rem;
-    scrollbar-width: thin;
-  }
-
+  nav { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; padding: .35rem .5rem; scrollbar-width: thin; }
   .tab-button { padding: .45rem .6rem; }
-
   .teoria-grid { grid-template-columns: 1fr; }
   .conceito-grid { grid-template-columns: 1fr; }
+  body.presentation-mode main { padding: 1rem; }
 }

@@ -71,6 +71,15 @@
   </div>
 </header>
 
+<!-- BARRA DE PROGRESSO -->
+<div id="progress-bar">
+  <div class="progress-steps" id="progress-steps"></div>
+  <span class="progress-label" id="progress-label">1 / 7</span>
+</div>
+
+<!-- BOTÃO MODO APRESENTAÇÃO -->
+<button id="btn-present" onclick="togglePresentation()">⛶ Apresentar</button>
+
 <!-- NAV -->
 <nav class="tabs" role="tablist" aria-label="Abas da apresentação">
   <button class="tab-button" id="tab-grupo" type="button" role="tab" aria-selected="true" aria-controls="panel-grupo" tabindex="0">O Grupo</button>
@@ -161,6 +170,10 @@
       <h2>Relação com a Teoria de Piaget</h2>
     </div>
     <div class="card-body">
+      <div class="quote-block">
+        O conhecimento não é uma cópia da realidade. Conhecer um objeto é agir sobre ele e transformá-lo.
+        <cite>— Jean Piaget</cite>
+      </div>
       <figure class="piaget-visual">
         <img src="Piaget.jpeg" alt="Infográfico sobre Piaget: assimilação, acomodação e equilibração, mostrando como a criança constrói novas ideias e aprende." />
       </figure>
@@ -192,6 +205,10 @@
       <h2>Relação com a Teoria de Vygotsky</h2>
     </div>
     <div class="card-body">
+      <div class="quote-block">
+        Aquilo que a criança pode fazer hoje em cooperação, ela será capaz de fazer sozinha amanhã.
+        <cite>— Lev Vygotsky</cite>
+      </div>
       <div class="teoria-grid">
         <div class="teoria-item">
           <h3>Mediação Social</h3>
