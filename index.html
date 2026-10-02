@@ -282,5 +282,64 @@
 </footer>
 
 <script src="tabs.js" defer></script>
+
+<!-- PLAYER DE MÚSICA -->
+<div id="music-player">
+  <audio id="bg-audio" loop>
+    <source src="ABC dos 5.mp3" type="audio/mpeg" />
+  </audio>
+  <button id="music-btn" onclick="toggleMusic()" title="Tocar/Pausar música">
+    <span id="music-icon">🎵</span>
+    <span id="music-label">Tocar música</span>
+  </button>
+</div>
+
+<style>
+  #music-player {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+  }
+  #music-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1a3a5c;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 18px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    transition: background 0.2s, transform 0.1s;
+  }
+  #music-btn:hover { background: #2563a8; transform: scale(1.04); }
+  #music-btn.playing { background: #f0a500; color: #1a3a5c; }
+</style>
+
+<script>
+  const audio = document.getElementById('bg-audio');
+  const btn = document.getElementById('music-btn');
+  const icon = document.getElementById('music-icon');
+  const label = document.getElementById('music-label');
+
+  function toggleMusic() {
+    if (audio.paused) {
+      audio.play();
+      icon.textContent = '⏸';
+      label.textContent = 'Pausar música';
+      btn.classList.add('playing');
+    } else {
+      audio.pause();
+      icon.textContent = '🎵';
+      label.textContent = 'Tocar música';
+      btn.classList.remove('playing');
+    }
+  }
+</script>
+
 </body>
 </html>
