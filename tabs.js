@@ -30,6 +30,13 @@ function togglePresentation() {
   document.body.classList.toggle('presentation-mode');
   const isOn = document.body.classList.contains('presentation-mode');
   btn.textContent = isOn ? '✕ Sair' : '⛶ Apresentar';
+  document.getElementById('nav-arrows').style.display = isOn ? 'flex' : 'none';
+}
+
+function navigateTab(dir) {
+  const current = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
+  const next = current + dir;
+  if (next >= 0 && next < tabs.length) activateTab(tabs[next], true);
 }
 
 function addIdeaIcons() {
@@ -164,3 +171,10 @@ window.addEventListener('load', alignTabPanels, { once: true });
 buildProgressDots();
 addIdeaIcons();
 alignTabPanels();
+
+// Navegar com teclado no modo apresentação
+document.addEventListener('keydown', (e) => {
+  if (!document.body.classList.contains('presentation-mode')) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigateTab(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigateTab(-1);
+});
