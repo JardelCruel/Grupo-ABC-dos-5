@@ -5,12 +5,16 @@ const panels = tabs.map((tab) => document.getElementById(tab.getAttribute('aria-
 // ── BARRA DE PROGRESSO ──
 const progressSteps = document.getElementById('progress-steps');
 const progressLabel = document.getElementById('progress-label');
+const progressFill = document.getElementById('progress-fill');
+const progressTrack = document.getElementById('progress-track');
 
 function buildProgressDots() {
   tabs.forEach((tab, i) => {
     const dot = document.createElement('button');
+    dot.type = 'button';
     dot.className = 'progress-dot' + (i === 0 ? ' active' : '');
     dot.title = tab.textContent.trim();
+    dot.setAttribute('aria-label', `Ir para o slide ${i + 1}: ${tab.textContent.trim()}`);
     dot.addEventListener('click', () => activateTab(tabs[i]));
     progressSteps.appendChild(dot);
   });
@@ -21,38 +25,48 @@ function updateProgress(activeIndex) {
     dot.classList.toggle('active', i === activeIndex);
   });
   progressLabel.textContent = `${activeIndex + 1} / ${tabs.length}`;
-}
-
-// ── TEMPORIZADOR DE SLIDE ──
-let timerInterval = null;
-let timerSeconds = 0;
-const timerDisplay = document.getElementById('timer-display');
-
-function startTimer() {
-  timerSeconds = 0;
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timerSeconds++;
-    const m = Math.floor(timerSeconds / 60);
-    const s = String(timerSeconds % 60).padStart(2, '0');
-    timerDisplay.textContent = `${m}:${s}`;
-  }, 1000);
-}
-
-function stopTimer() {
-  clearInterval(timerInterval);
-  timerInterval = null;
-  timerSeconds = 0;
-  if (timerDisplay) timerDisplay.textContent = '0:00';
+  progressFill.style.width = `${((activeIndex + 1) / tabs.length) * 100}%`;
+  progressTrack.setAttribute('aria-valuenow', String(activeIndex + 1));
 }
 
 // ── MODO APRESENTAÇÃO ──
-function togglePresentation() {
+async function togglePresentation() {
   const btn = document.getElementById('btn-present');
-  document.body.classList.toggle('presentation-mode');
+  const status = document.getElementById('presentation-status');
+
+  if (document.body.classList.contains('presentation-mode')) {
+    if (document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+      } catch (error) {
+        status.textContent = `Não foi possível sair da tela cheia: ${error.message}`;
+      }
+    } else {
+      document.body.classList.remove('presentation-mode');
+      updatePresentationButton();
+    }
+    return;
+  }
+
+  document.body.classList.add('presentation-mode');
+  updatePresentationButton();
+  status.textContent = '';
+
+  try {
+    if (!document.documentElement.requestFullscreen) {
+      throw new Error('Este navegador não oferece suporte à tela cheia.');
+    }
+    await document.documentElement.requestFullscreen();
+  } catch (error) {
+    status.textContent = `Não foi possível ativar a tela cheia: ${error.message}`;
+  }
+}
+
+function updatePresentationButton() {
+  const btn = document.getElementById('btn-present');
   const isOn = document.body.classList.contains('presentation-mode');
-  btn.textContent = isOn ? '✕ Sair' : '⛶ Apresentar';
-  isOn ? startTimer() : stopTimer();
+  btn.textContent = isOn ? '✕ Sair da apresentação' : '⛶ Modo apresentação';
+  btn.setAttribute('aria-pressed', String(isOn));
 }
 
 function navigateTab(dir) {
@@ -131,7 +145,6 @@ function activateTab(activeTab, moveFocus = false) {
   });
   updateProgress(activeIndex);
   document.title = `ABC dos 5 – ${activeTab.textContent.trim()}`;
-  if (timerInterval) startTimer();
   if (moveFocus) activeTab.focus();
 }
 
@@ -153,19 +166,93 @@ tabs.forEach((tab, index) => {
   });
 });
 
+document.addEventListener('keydown', (event) => {
+  if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.target.matches('input, textarea, select, [contenteditable="true"]')) return;
+
+  if (event.key === 'ArrowRight' || (document.body.classList.contains('presentation-mode') && event.key === 'ArrowDown')) {
+    event.preventDefault();
+    navigateTab(1);
+  } else if (event.key === 'ArrowLeft' || (document.body.classList.contains('presentation-mode') && event.key === 'ArrowUp')) {
+    event.preventDefault();
+    navigateTab(-1);
+  }
+});
+
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement && document.body.classList.contains('presentation-mode')) {
+    document.body.classList.remove('presentation-mode');
+  }
+  updatePresentationButton();
+});
+
 buildProgressDots();
 addIdeaIcons();
+updateProgress(0);
 
 // Expor funções globalmente para os onclick do HTML
 window.navigateTab = navigateTab;
 window.togglePresentation = togglePresentation;
-window.toggleMusic = window.toggleMusic;
 
-// Navegar com teclado no modo apresentação
-document.addEventListener('keydown', (e) => {
-  if (!document.body.classList.contains('presentation-mode')) return;
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigateTab(1);
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigateTab(-1);
+// ── CONTROLE DE ÁUDIO ──
+const audio = document.getElementById('bg-audio');
+const musicButton = document.getElementById('music-btn');
+const musicIcon = document.getElementById('music-icon');
+const musicLabel = document.getElementById('music-label');
+const musicStatus = document.getElementById('music-status');
+let playRequest = null;
+
+function updateMusicButton(isPlaying) {
+  musicIcon.textContent = isPlaying ? '⏸' : '▶';
+  musicLabel.textContent = isPlaying ? 'Pausar música' : 'Tocar música';
+  musicButton.setAttribute('aria-label', isPlaying ? 'Pausar música' : 'Tocar música');
+  musicButton.setAttribute('aria-pressed', String(isPlaying));
+  musicButton.classList.toggle('playing', isPlaying);
+}
+
+async function toggleMusic() {
+  musicStatus.textContent = '';
+  if (!audio.paused || playRequest) {
+    audio.pause();
+    return;
+  }
+
+  const request = audio.play();
+  playRequest = request;
+  try {
+    await request;
+  } catch (error) {
+    if (error.name !== 'AbortError' || !audio.paused) {
+      musicStatus.textContent = `Não foi possível reproduzir o áudio: ${error.message}`;
+    }
+  } finally {
+    if (playRequest === request) playRequest = null;
+  }
+}
+
+audio.addEventListener('playing', () => updateMusicButton(true));
+audio.addEventListener('pause', () => updateMusicButton(false));
+audio.addEventListener('error', () => {
+  updateMusicButton(false);
+  const errorMessages = {
+    1: 'A reprodução do áudio foi interrompida.',
+    2: 'Ocorreu um erro de rede ao carregar o áudio.',
+    3: 'O arquivo de áudio não pôde ser decodificado.',
+    4: 'O arquivo de áudio não foi encontrado ou não é compatível.'
+  };
+  musicStatus.textContent = errorMessages[audio.error?.code] || 'Não foi possível carregar o áudio.';
+});
+window.toggleMusic = toggleMusic;
+
+updatePresentationButton();
+updateMusicButton(false);
+
+// Navegar com Escape também encerra a apresentação quando a tela cheia não está disponível.
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && document.body.classList.contains('presentation-mode') && !document.fullscreenElement) {
+    document.body.classList.remove('presentation-mode');
+    updatePresentationButton();
+  }
 });
 
 // Paralaxe 3D no logo de fundo

@@ -35,9 +35,12 @@ body {
 /* ── MODO APRESENTAÇÃO ── */
 body.presentation-mode header,
 body.presentation-mode footer,
-body.presentation-mode #music-player { display: none !important; }
+body.presentation-mode nav,
+body.presentation-mode #progress-bar,
+body.presentation-mode #music-player,
+body.presentation-mode #slide-timer { display: none !important; }
 
-body.presentation-mode nav { top: 0; }
+body.presentation-mode #progress-track { display: block; }
 
 body.presentation-mode main {
   max-width: 100%;
@@ -68,6 +71,44 @@ body.presentation-mode .step-text span { font-size: 1rem; }
   letter-spacing: 0.5px;
 }
 #btn-present:hover { background: var(--charcoal); transform: scale(1.04); }
+#btn-present:focus-visible,
+#music-btn:focus-visible,
+.nav-arrow:focus-visible,
+.progress-dot:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+#presentation-status {
+  position: fixed;
+  top: 54px;
+  right: 16px;
+  z-index: 201;
+  max-width: min(24rem, calc(100vw - 32px));
+  color: #fff;
+  background: var(--coral);
+  border-radius: 8px;
+  padding: .5rem .75rem;
+  font-size: .85rem;
+}
+
+#presentation-status:empty { display: none; }
+
+/* ── INDICADOR FINO DE PROGRESSO ── */
+#progress-track {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1001;
+  height: 4px;
+  background: rgba(41, 38, 36, .18);
+}
+
+#progress-fill {
+  width: 14.2857%;
+  height: 100%;
+  background: #007bff;
+  transition: width .3s ease;
+}
 
 /* ── BARRA DE PROGRESSO ── */
 #progress-bar {
@@ -102,6 +143,38 @@ body.presentation-mode .step-text span { font-size: 1rem; }
   background: var(--coral);
   transform: scale(1.45);
 }
+
+#nav-arrows {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  display: none;
+  gap: 16px;
+  align-items: center;
+}
+
+body.presentation-mode #nav-arrows { display: flex; }
+
+.nav-arrow {
+  background: var(--charcoal);
+  color: var(--gold-light);
+  border: 2px solid var(--coral);
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
+  transition: background .2s, transform .15s;
+}
+
+.nav-arrow:hover { background: var(--coral); color: #fff; transform: scale(1.1); }
+.nav-arrow:active { transform: scale(.95); }
 
 .progress-label {
   color: rgba(255,255,255,0.45);
@@ -226,13 +299,15 @@ header {
   content: attr(data-name);
   position: absolute;
   bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
+  right: 0;
+  max-width: min(15rem, calc(100vw - 2rem));
+  transform: translateY(4px);
   background: var(--charcoal);
   color: var(--gold-light);
   font-size: .7rem;
   font-weight: 700;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
   padding: 3px 8px;
   border-radius: 6px;
   pointer-events: none;
@@ -244,7 +319,7 @@ header {
 
 .team-member-wrap:hover::after {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
 
 /* ── TEMPORIZADOR ── */
@@ -625,18 +700,38 @@ main {
 /* ── THEORIES ── */
 .piaget-visual { margin: 0 auto 1.25rem; max-width: 844px; }
 .piaget-visual img { display: block; width: 100%; height: auto; border-radius: 8px; }
+.piaget-visual figcaption { margin-top: .4rem; color: var(--muted); font-size: .82rem; text-align: center; }
 
 .teoria-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
+.piaget-flow {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 1rem;
+  gap: 1.5rem;
+}
+
 .teoria-item {
+  min-width: 0;
   background: var(--purple-light);
   border-radius: 10px;
   padding: 1.1rem 1.2rem;
   transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.piaget-flow .teoria-item { position: relative; }
+.piaget-flow .teoria-item:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  top: 50%;
+  right: -1.35rem;
+  color: var(--coral);
+  font-size: 1.25rem;
+  font-weight: 800;
+  transform: translate(50%, -50%);
 }
 
 .teoria-item:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
@@ -891,7 +986,106 @@ footer {
   border-top: 5px solid var(--coral);
 }
 
+#music-player {
+  margin: .75rem auto 0;
+}
+
+#music-btn {
+  display: inline-flex;
+  min-width: 48px;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  color: #fff;
+  background: #1a3a5c;
+  border: 2px solid transparent;
+  border-radius: 30px;
+  font: 600 .9rem 'Segoe UI', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+  transition: background .2s, transform .1s;
+}
+
+#music-btn:hover { background: #2563a8; transform: scale(1.04); }
+#music-btn.playing { color: #1a3a5c; background: #f0a500; }
+#music-status { display: block; margin-top: .4rem; color: #fff; font-size: .85rem; }
+
+/* ── PRINT / PDF ── */
+@media print {
+  @page { margin: 1.5cm; }
+
+  body {
+    color: #000;
+    background: #fff;
+    font-size: 11pt;
+  }
+
+  body::before,
+  #bg-logo,
+  #progress-track,
+  #progress-bar,
+  #slide-timer,
+  #btn-present,
+  #presentation-status,
+  #music-player,
+  nav,
+  footer,
+  #nav-arrows {
+    display: none !important;
+  }
+
+  main {
+    display: block;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .card,
+  .card[role="tabpanel"][hidden] {
+    display: flex !important;
+    margin: 0;
+    box-shadow: none;
+    border: 1px solid #ccc;
+    animation: none;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .card:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .card-header,
+  .quote-block,
+  .conclusao-brand {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
 /* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .integrantes-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .integrante-card { min-width: 0; }
+  .integrante-card strong { overflow-wrap: anywhere; }
+  .piaget-flow { grid-template-columns: 1fr; gap: 1rem; }
+  .piaget-flow .teoria-item:not(:last-child)::after {
+    content: '↓';
+    top: auto;
+    right: 50%;
+    bottom: -1rem;
+    transform: translate(50%, 50%);
+  }
+}
+
 @media (max-width: 560px) {
   .conclusao-brand { flex-direction: column; gap: 1rem; text-align: center; }
   .conclusao-logo { width: 100px; height: 100px; }
@@ -909,4 +1103,21 @@ footer {
   .teoria-grid { grid-template-columns: 1fr; }
   .conceito-grid { grid-template-columns: 1fr; }
   body.presentation-mode main { padding: 1rem; }
+  .card-body { padding: 1.1rem; }
+  .quote-block { padding: 1.2rem 1rem 1.2rem 2.7rem; overflow-wrap: anywhere; }
+  .step-text { min-width: 0; overflow-wrap: anywhere; }
+  #btn-present { top: auto; right: 12px; bottom: 12px; }
+  body.presentation-mode #btn-present { top: 12px; bottom: auto; }
+  #presentation-status { top: auto; right: 12px; bottom: 72px; }
+  body.presentation-mode #presentation-status { top: 58px; bottom: auto; }
+  #music-btn { width: min(100%, 20rem); }
+  .integrantes-cards { gap: .55rem; }
+}
+
+@media (max-width: 380px) {
+  .integrantes-cards { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #progress-fill { transition: none; }
 }

@@ -81,6 +81,9 @@
 </header>
 
 <!-- BARRA DE PROGRESSO -->
+<div id="progress-track" role="progressbar" aria-label="Progresso da apresentação" aria-valuemin="1" aria-valuemax="7" aria-valuenow="1">
+  <div id="progress-fill"></div>
+</div>
 <div id="progress-bar">
   <div class="progress-steps" id="progress-steps"></div>
   <span class="progress-label" id="progress-label">1 / 7</span>
@@ -90,7 +93,8 @@
 <div id="slide-timer" aria-live="polite" aria-label="Tempo no slide">⏱ <span id="timer-display">0:00</span></div>
 
 <!-- BOTÃO MODO APRESENTAÇÃO -->
-<button id="btn-present" onclick="togglePresentation()">⛶ Apresentar</button>
+<button id="btn-present" type="button" onclick="togglePresentation()" aria-pressed="false">⛶ Modo apresentação</button>
+<div id="presentation-status" role="status" aria-live="polite"></div>
 
 <!-- NAV -->
 <nav class="tabs" role="tablist" aria-label="Abas da apresentação">
@@ -107,7 +111,7 @@
 
   <section class="card" id="panel-grupo" role="tabpanel" aria-labelledby="tab-grupo" tabindex="0">
     <div class="card-header">
-      <div class="num num-logo"><img src="Logo_ABC_dos_5.jpeg" alt="" /></div>
+      <div class="num num-logo"><img src="Logo_ABC_dos_5.jpeg" alt="" aria-hidden="true" /></div>
       <h2>Grupo ABC dos 5 <svg class="idea-icon idea-icon--group" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
         <path d="M12 22h8m-7 3h6m-5 3h4m-2-26a8 8 0 0 0-4.7 14.5c1 .7 1.7 1.7 1.7 2.5h6c0-.8.7-1.8 1.7-2.5A8 8 0 0 0 16 2Z" />
         <path d="M16 0v-2M4 4 2.5 2.5M28 4l1.5-1.5M1 15h-2m32 0h-2" />
@@ -217,11 +221,15 @@
         <cite>— Jean Piaget</cite>
       </div>
 
+      <figure class="piaget-visual">
+        <img src="4 Estagio de Piaget.jpg" alt="4 Estágios de Piaget" />
+      </figure>
+
       <div class="caso-box" style="margin-bottom:1.25rem;text-align:center">
         <p><strong>Dar o primeiro passo e deixar com que a criança dê continuidade.</strong></p>
       </div>
 
-      <div class="teoria-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1rem">
+      <div class="teoria-grid piaget-flow">
         <div class="teoria-item">
           <h3>Assimilação</h3>
           <p>A criança testa o que já sabe:<br><em>“Por que o mundo é azul?”</em></p>
@@ -410,110 +418,25 @@
 
 <footer>
   Grupo <strong>ABC dos 5</strong> · Apresentação em Sala de Aula · UNINOVE
+  <div id="music-player">
+    <audio id="bg-audio" loop>
+      <source src="ABC dos 5.mp3" type="audio/mpeg" />
+    </audio>
+    <button id="music-btn" type="button" onclick="toggleMusic()" aria-label="Tocar música" aria-pressed="false">
+      <span id="music-icon" aria-hidden="true">▶</span>
+      <span id="music-label">Tocar música</span>
+    </button>
+    <span id="music-status" role="status" aria-live="polite"></span>
+  </div>
 </footer>
 
 <script src="tabs.js" defer></script>
 
 <!-- SETAS DE NAVEGAÇÃO -->
 <div id="nav-arrows">
-  <button class="nav-arrow" onclick="navigateTab(-1)" title="Anterior">&#8592;</button>
-  <button class="nav-arrow" onclick="navigateTab(1)"  title="Próximo">&#8594;</button>
+  <button class="nav-arrow" type="button" onclick="navigateTab(-1)" aria-label="Slide anterior" title="Anterior">&#8592;</button>
+  <button class="nav-arrow" type="button" onclick="navigateTab(1)" aria-label="Próximo slide" title="Próximo">&#8594;</button>
 </div>
-
-<style>
-  #nav-arrows {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 300;
-    display: none;
-    gap: 16px;
-    align-items: center;
-  }
-  body.presentation-mode #nav-arrows {
-    display: flex;
-  }
-  .nav-arrow {
-    background: var(--charcoal);
-    color: var(--gold-light);
-    border: 2px solid var(--coral);
-    border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
-    transition: background 0.2s, transform 0.15s;
-  }
-  .nav-arrow:hover {
-    background: var(--coral);
-    color: #fff;
-    transform: scale(1.1);
-  }
-  .nav-arrow:active { transform: scale(0.95); }
-</style>
-
-<!-- PLAYER DE MÚSICA -->
-<div id="music-player">
-  <audio id="bg-audio" loop>
-    <source src="ABC dos 5.mp3" type="audio/mpeg" />
-  </audio>
-  <button id="music-btn" onclick="toggleMusic()" title="Tocar/Pausar música">
-    <span id="music-icon">🎵</span>
-    <span id="music-label">Tocar música</span>
-  </button>
-</div>
-
-<style>
-  #music-player {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 999;
-  }
-  #music-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #1a3a5c;
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 18px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-    transition: background 0.2s, transform 0.1s;
-  }
-  #music-btn:hover { background: #2563a8; transform: scale(1.04); }
-  #music-btn.playing { background: #f0a500; color: #1a3a5c; }
-</style>
-
-<script>
-  const audio = document.getElementById('bg-audio');
-  const btn = document.getElementById('music-btn');
-  const icon = document.getElementById('music-icon');
-  const label = document.getElementById('music-label');
-
-  function toggleMusic() {
-    if (audio.paused) {
-      audio.play();
-      icon.textContent = '⏸';
-      label.textContent = 'Pausar música';
-      btn.classList.add('playing');
-    } else {
-      audio.pause();
-      icon.textContent = '🎵';
-      label.textContent = 'Tocar música';
-      btn.classList.remove('playing');
-    }
-  }
-</script>
 
 </body>
 </html>
